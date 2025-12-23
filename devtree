@@ -1,0 +1,963 @@
+/* stm32mp157f-custom-pinctrl.dtsi */
+#include <dt-bindings/pinctrl/stm32-pinfunc.h>
+
+&pinctrl {
+	/* --- ETHERNET (KSZ9031 RGMII) --- */
+	eth1_pins_a: eth1-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('G', 5, AF11)>, <STM32_PINMUX('G', 4, AF11)>,
+				 <STM32_PINMUX('B', 11, AF11)>, <STM32_PINMUX('G', 13, AF11)>,
+				 <STM32_PINMUX('G', 14, AF11)>, <STM32_PINMUX('C', 2, AF11)>,
+				 <STM32_PINMUX('E', 2, AF11)>;
+			bias-disable; drive-push-pull; slew-rate = <2>;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('C', 1, AF11)>, <STM32_PINMUX('A', 2, AF11)>;
+			bias-disable; drive-push-pull; slew-rate = <0>;
+		};
+		pins3 {
+			pinmux = <STM32_PINMUX('A', 1, AF11)>, <STM32_PINMUX('A', 7, AF11)>,
+				 <STM32_PINMUX('C', 4, AF11)>, <STM32_PINMUX('C', 5, AF11)>,
+				 <STM32_PINMUX('B', 0, AF11)>, <STM32_PINMUX('B', 1, AF11)>;
+			bias-disable;
+		};
+	};
+
+	/* --- USB PINS (Enable + OverCurrent) --- */
+	usb1_pins_a: usb1-0 {
+		pins {
+			pinmux = <STM32_PINMUX('H', 10, GPIO)>; /* USB1_EN */
+			bias-disable; drive-push-pull; slew-rate = <0>;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('H', 14, GPIO)>; /* USB1_OC */
+			bias-pull-up; 
+		};
+	};
+	usb2_pins_a: usb2-0 {
+		pins {
+			pinmux = <STM32_PINMUX('H', 11, GPIO)>; /* USB2_EN */
+			bias-disable; drive-push-pull; slew-rate = <0>;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('H', 15, GPIO)>; /* USB2_OC */
+			bias-pull-up;
+		};
+	};
+
+	/* --- STORAGE --- */
+	sdmmc1_pins_a: sdmmc1-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('C', 8, AF12)>, <STM32_PINMUX('C', 9, AF12)>,
+				 <STM32_PINMUX('C', 10, AF12)>, <STM32_PINMUX('C', 11, AF12)>,
+				 <STM32_PINMUX('D', 2, AF12)>;
+			slew-rate = <1>; drive-push-pull; bias-pull-up;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('C', 12, AF12)>;
+			slew-rate = <2>; drive-push-pull; bias-pull-up;
+		};
+	};
+
+	sdmmc2_pins_a: sdmmc2-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('B', 14, AF9)>, <STM32_PINMUX('B', 15, AF9)>,
+				 <STM32_PINMUX('B', 3, AF9)>, <STM32_PINMUX('B', 4, AF9)>,
+				 <STM32_PINMUX('A', 8, AF9)>, <STM32_PINMUX('A', 9, AF10)>,
+				 <STM32_PINMUX('E', 5, AF9)>, <STM32_PINMUX('D', 3, AF9)>,
+				 <STM32_PINMUX('G', 6, AF10)>;
+			slew-rate = <1>; drive-push-pull; bias-pull-up;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('E', 3, AF9)>;
+			slew-rate = <2>; drive-push-pull; bias-pull-up;
+		};
+	};
+
+	qspi_bk1_pins_a: qspi-bk1-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('F', 8, AF10)>, <STM32_PINMUX('F', 9, AF10)>,
+				 <STM32_PINMUX('F', 7, AF9)>,  <STM32_PINMUX('F', 6, AF9)>;
+			bias-disable; drive-push-pull; slew-rate = <1>;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('B', 10, AF9)>;
+			bias-pull-up; drive-push-pull; slew-rate = <1>;
+		};
+	};
+	qspi_clk_pins_a: qspi-clk-0 {
+		pins { pinmux = <STM32_PINMUX('F', 10, AF9)>; bias-disable; drive-push-pull; slew-rate = <2>; };
+	};
+
+	/* --- DISPLAY --- */
+	ltdc_pins_a: ltdc-0 {
+		pins {
+			pinmux = <STM32_PINMUX('J', 12, AF14)>, <STM32_PINMUX('J', 13, AF14)>,
+				 <STM32_PINMUX('J', 14, AF14)>, <STM32_PINMUX('J', 15, AF14)>,
+				 <STM32_PINMUX('K', 3, AF14)>,  <STM32_PINMUX('K', 4, AF14)>,
+				 <STM32_PINMUX('K', 5, AF14)>,  <STM32_PINMUX('K', 6, AF14)>,
+				 <STM32_PINMUX('J', 7, AF14)>,  <STM32_PINMUX('J', 8, AF14)>,
+				 <STM32_PINMUX('J', 9, AF14)>,  <STM32_PINMUX('J', 10, AF14)>,
+				 <STM32_PINMUX('J', 11, AF14)>, <STM32_PINMUX('K', 0, AF14)>,
+				 <STM32_PINMUX('K', 1, AF14)>,  <STM32_PINMUX('K', 2, AF14)>,
+				 <STM32_PINMUX('I', 15, AF14)>, <STM32_PINMUX('J', 0, AF14)>,
+				 <STM32_PINMUX('J', 1, AF14)>,  <STM32_PINMUX('J', 2, AF14)>,
+				 <STM32_PINMUX('J', 3, AF14)>,  <STM32_PINMUX('J', 4, AF14)>,
+				 <STM32_PINMUX('J', 5, AF14)>,  <STM32_PINMUX('J', 6, AF14)>,
+				 <STM32_PINMUX('I', 14, AF14)>, <STM32_PINMUX('K', 7, AF14)>,
+				 <STM32_PINMUX('I', 12, AF14)>, <STM32_PINMUX('I', 13, AF14)>;
+			bias-disable; drive-push-pull; slew-rate = <3>;
+		};
+	};
+
+	/* --- UARTS --- */
+	usart1_pins_a: usart1-0 { pins { pinmux = <STM32_PINMUX('A', 12, AF7)>; bias-disable; drive-push-pull; slew-rate = <0>; }; };
+	usart2_pins_a: usart2-0 {
+		pins1 { pinmux = <STM32_PINMUX('D', 5, AF7)>, <STM32_PINMUX('D', 4, AF7)>; bias-disable; drive-push-pull; slew-rate = <0>; };
+		pins2 { pinmux = <STM32_PINMUX('D', 6, AF7)>, <STM32_PINMUX('D', 3, AF7)>; bias-disable; };
+	};
+	uart4_pins_a: uart4-0 {
+		pins1 { pinmux = <STM32_PINMUX('G', 11, AF6)>; bias-disable; drive-push-pull; slew-rate = <0>; };
+		pins2 { pinmux = <STM32_PINMUX('B', 2, AF8)>; bias-disable; };
+	};
+	uart5_pins_a: uart5-0 {
+		pins1 { pinmux = <STM32_PINMUX('B', 6, AF12)>; bias-disable; drive-push-pull; slew-rate = <0>; };
+		pins2 { pinmux = <STM32_PINMUX('B', 12, AF12)>; bias-disable; };
+	};
+	usart6_pins_a: usart6-0 {
+		pins1 { pinmux = <STM32_PINMUX('C', 6, AF7)>, <STM32_PINMUX('G', 12, AF7)>; bias-disable; drive-push-pull; slew-rate = <0>; };
+		pins2 { pinmux = <STM32_PINMUX('G', 9, AF7)>; bias-disable; };
+	};
+	uart7_pins_a: uart7-0 {
+		pins1 { pinmux = <STM32_PINMUX('E', 8, AF7)>, <STM32_PINMUX('E', 9, AF7)>; bias-disable; drive-push-pull; slew-rate = <0>; };
+		pins2 { pinmux = <STM32_PINMUX('E', 7, AF7)>; bias-disable; };
+	};
+	uart8_pins_a: uart8-0 {
+		pins1 { pinmux = <STM32_PINMUX('E', 1, AF8)>, <STM32_PINMUX('E', 14, AF8)>; bias-disable; drive-push-pull; slew-rate = <0>; };
+		pins2 { pinmux = <STM32_PINMUX('E', 0, AF8)>; bias-disable; };
+	};
+
+	/* --- I2C --- */
+	i2c2_pins_a: i2c2-0 {
+		pins { pinmux = <STM32_PINMUX('H', 4, AF4)>, <STM32_PINMUX('H', 5, AF4)>; bias-disable; drive-open-drain; slew-rate = <0>; };
+	};
+	i2c5_pins_a: i2c5-0 {
+		pins { pinmux = <STM32_PINMUX('A', 11, AF4)>; bias-disable; drive-open-drain; slew-rate = <0>; };
+	};
+	i2c6_pins_a: i2c6-0 {
+		pins { pinmux = <STM32_PINMUX('D', 1, AF4)>, <STM32_PINMUX('D', 0, AF4)>; bias-disable; drive-open-drain; slew-rate = <0>; };
+	};
+	can1_pins_a: can1-0 {
+		pins1 { pinmux = <STM32_PINMUX('H', 13, AF9)>; bias-disable; drive-push-pull; slew-rate = <0>; };
+		pins2 { pinmux = <STM32_PINMUX('I', 9, AF9)>; bias-disable; };
+	};
+};
+
+&pinctrl_z {
+	usart1_pins_z_a: usart1-0 {
+		pins { pinmux = <STM32_PINMUX('Z', 7, AF7)>; bias-disable; drive-push-pull; slew-rate = <0>; };
+		pins2 { pinmux = <STM32_PINMUX('Z', 6, AF7)>; bias-disable; };
+	};
+	i2c5_pins_z_a: i2c5-0 {
+		pins { pinmux = <STM32_PINMUX('Z', 1, AF4)>; bias-disable; drive-open-drain; slew-rate = <0>; };
+	};
+	i2c4_pins_z_a: i2c4-0 {
+		pins { pinmux = <STM32_PINMUX('Z', 4, AF6)>, <STM32_PINMUX('Z', 5, AF6)>; bias-disable; drive-open-drain; slew-rate = <0>; };
+	};
+};
+
+/* stm32mp157f-custom-boot.dtsi */
+
+/ {
+	/* RESERVED MEMORY for Scarthgap/OP-TEE */
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		/* OP-TEE Core Memory (End of RAM) */
+		optee@fe000000 {
+			reg = <0xfe000000 0x02000000>;
+			no-map;
+		};
+
+		/* 2MB Shared Memory (SCMI / RPMsg) */
+		m4_reserved: m4@10000000 {
+			reg = <0x10000000 0x00200000>;
+			no-map;
+		};
+	};
+
+	/* SYSRAM Reservation */
+	sram: sram@2ffc0000 {
+		compatible = "mmio-sram";
+		reg = <0x2ffc0000 0x40000>; /* 256KB */
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0 0x2ffc0000 0x40000>;
+
+		scmi_sram: scmi-sram@0 {
+			reg = <0x0 0x1000>;
+		};
+	};
+};
+
+/* --- PMIC --- */
+&i2c4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c4_pins_z_a>;
+	i2c-scl-rising-time-ns = <185>;
+	i2c-scl-falling-time-ns = <20>;
+	status = "okay";
+
+	pmic: stpmic@33 {
+		compatible = "st,stpmic1";
+		reg = <0x33>;
+		interrupts-extended = <&exti_pwr 55 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		status = "okay";
+
+		regulators {
+			compatible = "st,stpmic1-regulators";
+			
+			ldo1-supply = <&v3v3>;
+			ldo2-supply = <&v3v3>;
+			ldo3-supply = <&vdd_ddr>;
+			ldo5-supply = <&v3v3>;
+			ldo6-supply = <&v3v3>;
+			pwr_sw1-supply = <&bst_out>;
+			pwr_sw2-supply = <&bst_out>;
+
+			vddcore: buck1 {
+				regulator-name = "vddcore";
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <1350000>;
+				regulator-always-on;
+			};
+			vdd_ddr: buck2 {
+				regulator-name = "vdd_ddr";
+				regulator-min-microvolt = <1350000>;
+				regulator-max-microvolt = <1350000>;
+				regulator-always-on;
+			};
+			v3v3: buck3 {
+				regulator-name = "v3v3";
+				regulator-min-microvolt = <3300000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+				regulator-boot-on;
+			};
+			vdda: buck4 {
+				regulator-name = "vdda";
+				regulator-min-microvolt = <3300000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+			};
+			v1v8_audio: ldo1 {
+				regulator-name = "v1v8_audio";
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
+				regulator-always-on;
+			};
+			v3v3_hdmi: ldo2 {
+				regulator-name = "v3v3_hdmi";
+				regulator-min-microvolt = <3300000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+			};
+			vtt_ddr: ldo3 {
+				regulator-name = "vtt_ddr";
+				regulator-min-microvolt = <500000>;
+				regulator-max-microvolt = <750000>;
+				regulator-always-on;
+			};
+			vdd_usb: ldo4 {
+				regulator-name = "vdd_usb";
+				regulator-min-microvolt = <3300000>;
+				regulator-max-microvolt = <3300000>;
+			};
+			ldo5 {
+				regulator-name = "v3v3_sd";
+				regulator-min-microvolt = <2900000>;
+				regulator-max-microvolt = <2900000>;
+				regulator-boot-on;
+			};
+			ldo6 {
+				regulator-name = "v1v8_sd";
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
+			};
+			bst_out: boost {
+				regulator-name = "bst_out";
+			};
+		};
+	};
+};
+
+/* --- Boot Storage --- */
+&qspi {
+	pinctrl-names = "default";
+	pinctrl-0 = <&qspi_clk_pins_a &qspi_bk1_pins_a>;
+	reg = <0x58003000 0x1000>, <0x70000000 0x4000000>;
+	status = "okay";
+	flash0: flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-rx-bus-width = <4>;
+		spi-max-frequency = <108000000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+	};
+};
+
+&sdmmc1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdmmc1_pins_a>;
+	cd-gpios = <&gpiog 1 GPIO_ACTIVE_LOW>;
+	disable-wp;
+	st,neg-edge;
+	bus-width = <4>;
+	vmmc-supply = <&v3v3>;
+	status = "okay";
+};
+
+&sdmmc2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdmmc2_pins_a>;
+	non-removable;
+	no-sd;
+	no-sdio;
+	st,neg-edge;
+	bus-width = <8>;
+	vmmc-supply = <&v3v3>;
+	status = "okay";
+};
+
+/* stm32mp157f-custom-tfa.dts */
+#include <dt-bindings/clock/stm32mp1-clksrc.h>
+#include "stm32mp157.dtsi"
+#include "stm32mp157fac-pinctrl.dtsi"
+#include "stm32mp157f-custom-pinctrl.dtsi"
+#include "stm32mp157f-custom-boot.dtsi"
+
+/ {
+	model = "STMicroelectronics STM32MP157F Custom Board";
+	compatible = "st,stm32mp157f-custom", "st,stm32mp157";
+
+	aliases {
+		serial0 = &uart4;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+};
+
+/* --- Clock Configuration (Scarthgap/TF-A v2.10 Format) --- */
+&rcc {
+	st,clksrc = <
+		CLK_MPU_PLL1P
+		CLK_AXI_PLL2P
+		CLK_MCU_PLL3P
+		CLK_PLL12_HSE
+		CLK_PLL3_HSE
+		CLK_PLL4_HSE
+		CLK_RTC_LSE
+		CLK_MCO1_DISABLED
+		CLK_MCO2_DISABLED
+	>;
+	
+	/* FIXED: Using DIV() Macros */
+	st,clkdiv = <
+		DIV(DIV_MPU, 1)
+		DIV(DIV_AXI, 0)
+		DIV(DIV_MCU, 0)
+		DIV(DIV_APB1, 1)
+		DIV(DIV_APB2, 1)
+		DIV(DIV_APB3, 1)
+		DIV(DIV_APB4, 1)
+		DIV(DIV_APB5, 2)
+		DIV(DIV_RTC, 23)
+		DIV(DIV_MCO1, 0)
+		DIV(DIV_MCO2, 0)
+	>;
+	
+	st,pkcs = <
+		CLK_CKPER_HSE
+		CLK_ETH_PLL4P
+		CLK_SDMMC12_PLL4P
+		CLK_STGEN_HSE
+		CLK_USBPHY_HSE
+		CLK_SPI2S1_PLL3Q
+		CLK_SPI2S23_PLL3Q
+		CLK_SPI45_HSI
+		CLK_SPI6_HSI
+		CLK_I2C46_HSI
+		CLK_SDMMC3_PLL4P
+		CLK_ADC_CKPER
+		CLK_CEC_LSE
+		CLK_I2C12_HSI
+		CLK_I2C35_HSI
+		CLK_UART1_HSI
+		CLK_UART24_HSI
+		CLK_UART35_HSI
+		CLK_UART6_HSI
+		CLK_UART78_HSI
+		CLK_SPDIF_PLL4P
+		CLK_SAI1_PLL3Q
+		CLK_SAI2_PLL3Q
+		CLK_SAI3_PLL3Q
+		CLK_SAI4_PLL3Q
+		CLK_LPTIM1_PCLK1
+		CLK_LPTIM23_PCLK3
+		CLK_LPTIM45_LSE
+	>;
+};
+
+/* --- Boot Peripherals --- */
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart4_pins_a>;
+	status = "okay";
+};
+
+&sdmmc1 { status = "okay"; };
+&sdmmc2 { status = "okay"; };
+&qspi { status = "okay"; };
+
+/* stm32mp157f-custom-tfa.dts */
+#include <dt-bindings/clock/stm32mp1-clksrc.h>
+#include "stm32mp157.dtsi"
+#include "stm32mp157fac-pinctrl.dtsi"
+#include "stm32mp157f-custom-pinctrl.dtsi"
+#include "stm32mp157f-custom-boot.dtsi"
+
+/ {
+	model = "STMicroelectronics STM32MP157F Custom Board";
+	compatible = "st,stm32mp157f-custom", "st,stm32mp157";
+
+	aliases {
+		serial0 = &uart4;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+};
+
+/* --- Clock Configuration (Scarthgap/TF-A v2.10 Format) --- */
+&rcc {
+	st,clksrc = <
+		CLK_MPU_PLL1P
+		CLK_AXI_PLL2P
+		CLK_MCU_PLL3P
+		CLK_PLL12_HSE
+		CLK_PLL3_HSE
+		CLK_PLL4_HSE
+		CLK_RTC_LSE
+		CLK_MCO1_DISABLED
+		CLK_MCO2_DISABLED
+	>;
+	
+	/* FIXED: Using DIV() Macros */
+	st,clkdiv = <
+		DIV(DIV_MPU, 1)
+		DIV(DIV_AXI, 0)
+		DIV(DIV_MCU, 0)
+		DIV(DIV_APB1, 1)
+		DIV(DIV_APB2, 1)
+		DIV(DIV_APB3, 1)
+		DIV(DIV_APB4, 1)
+		DIV(DIV_APB5, 2)
+		DIV(DIV_RTC, 23)
+		DIV(DIV_MCO1, 0)
+		DIV(DIV_MCO2, 0)
+	>;
+	
+	st,pkcs = <
+		CLK_CKPER_HSE
+		CLK_ETH_PLL4P
+		CLK_SDMMC12_PLL4P
+		CLK_STGEN_HSE
+		CLK_USBPHY_HSE
+		CLK_SPI2S1_PLL3Q
+		CLK_SPI2S23_PLL3Q
+		CLK_SPI45_HSI
+		CLK_SPI6_HSI
+		CLK_I2C46_HSI
+		CLK_SDMMC3_PLL4P
+		CLK_ADC_CKPER
+		CLK_CEC_LSE
+		CLK_I2C12_HSI
+		CLK_I2C35_HSI
+		CLK_UART1_HSI
+		CLK_UART24_HSI
+		CLK_UART35_HSI
+		CLK_UART6_HSI
+		CLK_UART78_HSI
+		CLK_SPDIF_PLL4P
+		CLK_SAI1_PLL3Q
+		CLK_SAI2_PLL3Q
+		CLK_SAI3_PLL3Q
+		CLK_SAI4_PLL3Q
+		CLK_LPTIM1_PCLK1
+		CLK_LPTIM23_PCLK3
+		CLK_LPTIM45_LSE
+	>;
+};
+
+/* --- Boot Peripherals --- */
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart4_pins_a>;
+	status = "okay";
+};
+
+&sdmmc1 { status = "okay"; };
+&sdmmc2 { status = "okay"; };
+&qspi { status = "okay"; };
+
+/* stm32mp157f-custom-optee.dts */
+#include <dt-bindings/clock/stm32mp1-clksrc.h>
+#include "stm32mp157.dtsi"
+#include "stm32mp157fac-pinctrl.dtsi"
+#include "stm32mp157f-custom-pinctrl.dtsi"
+#include "stm32mp157f-custom-boot.dtsi"
+
+/ {
+	model = "STMicroelectronics STM32MP157F Custom Board";
+	compatible = "st,stm32mp157f-custom", "st,stm32mp157";
+
+	aliases {
+		serial0 = &uart4;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+};
+
+&rcc {
+	st,clksrc = <
+		CLK_MPU_PLL1P
+		CLK_AXI_PLL2P
+		CLK_MCU_PLL3P
+		CLK_PLL12_HSE
+		CLK_PLL3_HSE
+		CLK_PLL4_HSE
+		CLK_RTC_LSE
+		CLK_MCO1_DISABLED
+		CLK_MCO2_DISABLED
+	>;
+
+	/* FIXED: Using DIV() Macros */
+	st,clkdiv = <
+		DIV(DIV_MPU, 1)
+		DIV(DIV_AXI, 0)
+		DIV(DIV_MCU, 0)
+		DIV(DIV_APB1, 1)
+		DIV(DIV_APB2, 1)
+		DIV(DIV_APB3, 1)
+		DIV(DIV_APB4, 1)
+		DIV(DIV_APB5, 2)
+		DIV(DIV_RTC, 23)
+		DIV(DIV_MCO1, 0)
+		DIV(DIV_MCO2, 0)
+	>;
+	
+	st,pkcs = <
+		CLK_CKPER_HSE
+		CLK_ETH_PLL4P
+		CLK_SDMMC12_PLL4P
+		CLK_STGEN_HSE
+		CLK_USBPHY_HSE
+		CLK_SPI2S1_PLL3Q
+		CLK_SPI2S23_PLL3Q
+		CLK_SPI45_HSI
+		CLK_SPI6_HSI
+		CLK_I2C46_HSI
+		CLK_SDMMC3_PLL4P
+		CLK_ADC_CKPER
+		CLK_CEC_LSE
+		CLK_I2C12_HSI
+		CLK_I2C35_HSI
+		CLK_UART1_HSI
+		CLK_UART24_HSI
+		CLK_UART35_HSI
+		CLK_UART6_HSI
+		CLK_UART78_HSI
+		CLK_SPDIF_PLL4P
+		CLK_SAI1_PLL3Q
+		CLK_SAI2_PLL3Q
+		CLK_SAI3_PLL3Q
+		CLK_SAI4_PLL3Q
+		CLK_LPTIM1_PCLK1
+		CLK_LPTIM23_PCLK3
+		CLK_LPTIM45_LSE
+	>;
+};
+
+/* --- Secure Peripherals --- */
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart4_pins_a>;
+	status = "okay";
+};
+
+/* Firewall Configuration (ETZPC) */
+&etzpc {
+	status = "okay";
+	st,decprot = <
+		DECPROT(STM32MP1_ETZPC_UART4_ID, DECPROT_S_RW, DECPROT_UNLOCK)
+		DECPROT(STM32MP1_ETZPC_I2C4_ID, DECPROT_S_RW, DECPROT_UNLOCK)
+		DECPROT(STM32MP1_ETZPC_ETH_ID, DECPROT_NS_RW, DECPROT_UNLOCK)
+		DECPROT(STM32MP1_ETZPC_SDMMC1_ID, DECPROT_NS_RW, DECPROT_UNLOCK)
+		DECPROT(STM32MP1_ETZPC_SDMMC2_ID, DECPROT_NS_RW, DECPROT_UNLOCK)
+		DECPROT(STM32MP1_ETZPC_QSPI_ID, DECPROT_NS_RW, DECPROT_UNLOCK)
+		DECPROT(STM32MP1_ETZPC_OTG_ID, DECPROT_NS_RW, DECPROT_UNLOCK)
+	>;
+};
+
+/* stm32mp157f-custom-fw-config.dts */
+#include <dt-bindings/board/stm32mp15-fw-config.h>
+
+/dts-v1/;
+
+/ {
+	model = "STMicroelectronics STM32MP157F Custom Board";
+	compatible = "st,stm32mp157f-custom", "st,stm32mp157";
+
+	firewall-config {
+		compatible = "st,stm32mp1-fd-sygen";
+
+		etzpc: etzpc@5c007000 {
+			compatible = "st,stm32-etzpc-fw-config";
+			reg = <0x5c007000 0x400>;
+			status = "okay";
+
+			/* Secure */
+			uart4: uart4@40010000 { st,decprot = <DECPROT(STM32MP1_ETZPC_UART4_ID, DECPROT_S_RW, DECPROT_UNLOCK)>; };
+			i2c4: i2c4@5c002000 { st,decprot = <DECPROT(STM32MP1_ETZPC_I2C4_ID, DECPROT_S_RW, DECPROT_UNLOCK)>; };
+			stgenc: stgenc@5c008000 { st,decprot = <DECPROT(STM32MP1_ETZPC_STGENC_ID, DECPROT_S_RW, DECPROT_UNLOCK)>; };
+
+			/* Non-Secure */
+			eth1: eth1@5800a000 { st,decprot = <DECPROT(STM32MP1_ETZPC_ETH_ID, DECPROT_NS_RW, DECPROT_UNLOCK)>; };
+			sdmmc1: sdmmc1@58005000 { st,decprot = <DECPROT(STM32MP1_ETZPC_SDMMC1_ID, DECPROT_NS_RW, DECPROT_UNLOCK)>; };
+			sdmmc2: sdmmc2@58007000 { st,decprot = <DECPROT(STM32MP1_ETZPC_SDMMC2_ID, DECPROT_NS_RW, DECPROT_UNLOCK)>; };
+			qspi: qspi@58003000 { st,decprot = <DECPROT(STM32MP1_ETZPC_QSPI_ID, DECPROT_NS_RW, DECPROT_UNLOCK)>; };
+			usbh: usbh@5800c000 { st,decprot = <DECPROT(STM32MP1_ETZPC_OTG_ID, DECPROT_NS_RW, DECPROT_UNLOCK)>; };
+		};
+	};
+};
+
+/* stm32mp157f-custom-u-boot.dtsi */
+#include "stm32mp157f-custom-pinctrl.dtsi"
+
+&pinctrl { bootph-all; };
+&pinctrl_z { bootph-all; };
+&uart4 { bootph-all; };
+&sdmmc1 { bootph-all; };
+&sdmmc2 { bootph-all; };
+&i2c4 { bootph-all; };
+&pmic { bootph-all; };
+
+/* Regulators needed in SPL */
+&v3v3 { bootph-all; };
+&vdd_ddr { bootph-all; };
+&vddcore { bootph-all; };
+
+/ {
+	aliases {
+		serial0 = &uart4;
+	};
+	config {
+		u-boot,boot-led = "heartbeat";
+		u-boot,error-led = "error";
+	};
+};
+
+/* stm32mp157f-custom.dts */
+/dts-v1/;
+
+#include "stm32mp157.dtsi"
+#include "stm32mp157fac-pinctrl.dtsi"
+#include "stm32mp157f-custom-pinctrl.dtsi"
+#include "stm32mp157f-custom-boot.dtsi"
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+/ {
+	model = "STMicroelectronics STM32MP157F Custom Board";
+	compatible = "st,stm32mp157f-custom", "st,stm32mp157";
+
+	aliases {
+		serial0 = &uart4;
+		serial1 = &usart1;
+		serial2 = &usart2;
+		serial3 = &usart6;
+		serial4 = &uart7;
+		serial5 = &uart8;
+		ethernet0 = &ethernet0;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory@c0000000 {
+		device_type = "memory";
+		reg = <0xc0000000 0x20000000>;
+	};
+
+	/* --- USB POWER (SCARTHGAP FIX: Regulator-fixed with OC-GPIOS) --- */
+	vbus_sw_usb1: regulator-usb1-switch {
+		compatible = "regulator-fixed";
+		regulator-name = "vbus_sw_usb1";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpioh 10 GPIO_ACTIVE_HIGH>; 
+		enable-active-high;
+		/* Monitor PH14 for OverCurrent (Active Low) */
+		oc-gpios = <&gpioh 14 GPIO_ACTIVE_LOW>;
+	};
+
+	vbus_sw_usb2: regulator-usb2-switch {
+		compatible = "regulator-fixed";
+		regulator-name = "vbus_sw_usb2";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpioh 11 GPIO_ACTIVE_HIGH>; 
+		enable-active-high;
+		/* Monitor PH15 for OverCurrent (Active Low) */
+		oc-gpios = <&gpioh 15 GPIO_ACTIVE_LOW>;
+	};
+
+	/* --- HDMI Bridge --- */
+	tfp410_bridge: tfp410-bridge {
+		compatible = "ti,tfp410";
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			port@0 { reg = <0>; tfp410_in: endpoint { remote-endpoint = <&ltdc_ep0>; }; };
+			port@1 { reg = <1>; tfp410_out: endpoint { remote-endpoint = <&hdmi_con>; }; };
+		};
+	};
+
+	hdmi-connector {
+		compatible = "hdmi-connector";
+		type = "a";
+		port { hdmi_con: endpoint { remote-endpoint = <&tfp410_out>; }; };
+	};
+};
+
+/* --- PERIPHERALS --- */
+
+/* Ethernet */
+&ethernet0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&eth1_pins_a>;
+	phy-mode = "rgmii-id";
+	max-speed = <1000>;
+	phy-handle = <&phy0>;
+	phy-reset-gpios = <&gpiog 0 GPIO_ACTIVE_LOW>;
+	status = "okay";
+	mdio0 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "snps,dwmac-mdio";
+		phy0: ethernet-phy@0 { compatible = "micrel,ksz9031"; reg = <0>; };
+	};
+};
+
+/* USB */
+&usbh_ehci {
+	phys = <&usbphyc_port0>;
+	phy-names = "usb";
+	vbus-supply = <&vbus_sw_usb1>;
+	status = "okay";
+};
+&usbotg_hs {
+	phys = <&usbphyc_port1 0>;
+	phy-names = "usb2-phy";
+	vbus-supply = <&vbus_sw_usb2>;
+	status = "okay";
+};
+&usbphyc { status = "okay"; };
+&usbphyc_port0 { phy-supply = <&vdd_usb>; };
+&usbphyc_port1 { phy-supply = <&vdd_usb>; };
+
+/* Display */
+&ltdc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&ltdc_pins_a>;
+	status = "okay";
+	port { ltdc_ep0: endpoint@0 { reg = <0>; remote-endpoint = <&tfp410_in>; }; };
+};
+
+/* Sensors */
+&i2c5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c5_pins_a &i2c5_pins_z_a>;
+	status = "okay";
+	hdc1080@40 { compatible = "ti,hdc1080"; reg = <0x40>; };
+	eeprom@50 { compatible = "rohm,br24g01", "atmel,24c1024"; reg = <0x50>; pagesize = <256>; };
+};
+&i2c2 { pinctrl-names = "default"; pinctrl-0 = <&i2c2_pins_a>; status = "okay"; };
+&i2c6 { pinctrl-names = "default"; pinctrl-0 = <&i2c6_pins_a>; status = "okay"; };
+
+/* UARTs */
+&usart1 { pinctrl-names = "default"; pinctrl-0 = <&usart1_pins_a &usart1_pins_z_a>; uart-has-rtscts; status = "okay"; };
+&usart2 { pinctrl-names = "default"; pinctrl-0 = <&usart2_pins_a>; uart-has-rtscts; status = "okay"; };
+&uart4 { pinctrl-names = "default"; pinctrl-0 = <&uart4_pins_a>; status = "okay"; };
+&uart5 { pinctrl-names = "default"; pinctrl-0 = <&uart5_pins_a>; status = "okay"; };
+&usart6 { pinctrl-names = "default"; pinctrl-0 = <&usart6_pins_a>; status = "okay"; };
+&uart7 { pinctrl-names = "default"; pinctrl-0 = <&uart7_pins_a>; status = "okay"; };
+&uart8 { pinctrl-names = "default"; pinctrl-0 = <&uart8_pins_a>; status = "okay"; };
+&can1 { pinctrl-names = "default"; pinctrl-0 = <&can1_pins_a>; status = "okay"; };
+
+
+
+//tfa-config
+# Architecture & Platform
+STM32MP15=y
+ARCH=aarch32
+ARM_ARCH_MAJOR=7
+
+# Device Tree to Compile (Must match your file name)
+DTB_FILE_NAME=stm32mp157f-custom.dtb
+
+# Boot Device Support
+STM32MP_SDMMC=y
+STM32MP_SPI_NOR=y
+STM32MP_EMMC=y
+
+# Memory Layout (Critical for OP-TEE/SCMI)
+# 0x02000000 = 32MB reserved for Secure World at top of RAM
+STM32MP_OPTEE_SIZE=0x02000000 
+
+# Power Management
+STM32MP_PMIC=y
+STM32MP_REGULATOR=y
+
+//optee-config
+# Platform Flavor
+PLATFORM=stm32mp1
+PLATFORM_FLAVOR=157F_DK2
+CFG_STM32MP15=y
+
+# Architecture
+CFG_ARM32_core=y
+CFG_WITH_LPAE=y
+CFG_CORE_LARGE_PHYS_ADDR=y
+
+# Device Tree
+CFG_EMBED_DTB=y
+CFG_EMBED_DTB_SOURCE_FILE=stm32mp157f-custom.dts
+
+# Drivers Required for Boot/Security
+CFG_STM32_ETZPC=y       # Firewall
+CFG_STM32_I2C=y         # PMIC Control
+CFG_STM32_GPIO=y        # USB Power/Reset Pins
+CFG_STM32_BSEC=y        # OTP Fuses
+CFG_STM32_TIM=y         # Timers
+
+# Memory Management (Matches 2MB Shared Memory request)
+CFG_CORE_DYN_SHM=y
+CFG_CORE_HEAP_SIZE=65536
+CFG_TZDRAM_START=0xfe000000 # Top 32MB Base
+CFG_TZDRAM_SIZE=0x02000000
+
+//uboot config
+# --- General Setup ---
+CONFIG_ARM=y
+CONFIG_ARCH_STM32MP=y
+CONFIG_TFABOOT=y
+CONFIG_SYS_MALLOC_F_LEN=0x3000
+CONFIG_ENV_SIZE=0x2000
+CONFIG_DEFAULT_DEVICE_TREE="stm32mp157f-custom"
+CONFIG_STM32MP15x=y
+CONFIG_TARGET_STM32MP1=y
+CONFIG_CMD_STM32KEY=y
+
+# --- Networking (KSZ9031) ---
+CONFIG_NET_RANDOM_ETHADDR=y
+CONFIG_PHY_MICREL=y
+CONFIG_PHY_MICREL_KSZ90X1=y
+CONFIG_ETH_DESIGNWARE=y
+CONFIG_DW_GMAC=y
+CONFIG_MII=y
+
+# --- Power & PMIC ---
+CONFIG_DM_PMIC=y
+CONFIG_PMIC_STPMIC1=y
+CONFIG_DM_REGULATOR=y
+CONFIG_DM_REGULATOR_FIXED=y
+CONFIG_DM_REGULATOR_STPMIC1=y
+CONFIG_CMD_REGULATOR=y
+
+# --- Storage (eMMC / SD / QSPI) ---
+CONFIG_DM_MMC=y
+CONFIG_SUPPORT_EMMC_BOOT=y
+CONFIG_MMC_STM32_SDMMC2=y
+CONFIG_DM_SPI_FLASH=y
+CONFIG_SPI_FLASH_MACRONIX=y
+CONFIG_SPI_FLASH_SPANSION=y
+CONFIG_SPI_FLASH_STMICRO=y
+CONFIG_SPI_FLASH_WINBOND=y
+CONFIG_SPI_FLASH_MTD=y
+
+# --- Communication ---
+CONFIG_DM_I2C=y
+CONFIG_SYS_I2C_STM32F7=y
+CONFIG_DM_SPI=y
+CONFIG_STM32_QSPI=y
+CONFIG_DM_SERIAL=y
+
+# --- Security & SCMI ---
+CONFIG_TEE=y
+CONFIG_OPTEE=y
+CONFIG_SCMI_FIRMWARE=y
+CONFIG_CLK_SCMI=y
+CONFIG_RESET_SCMI=y
+
+//kernel config
+# --- Networking (KSZ9031RNX) ---
+CONFIG_NET_VENDOR_MICREL=y
+CONFIG_MICREL_PHY=y
+CONFIG_STMMAC_ETH=y
+CONFIG_STMMAC_PLATFORM=y
+
+# --- Display (LTDC + TFP410) ---
+CONFIG_DRM=y
+CONFIG_DRM_STM=y
+CONFIG_DRM_STM_DSI=n      # Explicitly disable DSI to save space
+CONFIG_DRM_TI_TFP410=y    # The HDMI Bridge Driver
+CONFIG_DRM_I2C_NXP_TDA998X=n
+
+# --- Sensors (I2C5) ---
+CONFIG_IIO=y
+CONFIG_HDC100X=y          # TI HDC1080 Temp/Humidity
+CONFIG_EEPROM_AT24=y      # ROHM/Atmel EEPROM Support
+
+# --- USB (Power Switching) ---
+CONFIG_USB_STM32_USBH=y
+CONFIG_USB_DWC2=y
+CONFIG_USB_DWC2_DUAL_ROLE=y
+# Critical for the USB Power Switches defined in DT
+CONFIG_REGULATOR_FIXED_VOLTAGE=y 
+
+# --- SCMI & Mailbox (Comm with M4/OP-TEE) ---
+CONFIG_ARM_SCMI_PROTOCOL=y
+CONFIG_COMMON_CLK_SCMI=y
+CONFIG_REGULATOR_SCMI=y
+CONFIG_RESET_SCMI=y
+CONFIG_MAILBOX=y
+CONFIG_STM32_IPCC=y
+
+# --- Memory/DMA ---
+CONFIG_SRAM=y
+CONFIG_DMADEVICES=y
+CONFIG_STM32_DMA=y
+CONFIG_STM32_DMAMUX=y
