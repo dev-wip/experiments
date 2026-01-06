@@ -1,0 +1,99 @@
+/ {
+    /* --- Regulators --- */
+    
+    /* Regulator for USB1 (Host) */
+    vbus_sw_usb1: regulator-vbus-usb1 {
+        compatible = "regulator-fixed";
+        regulator-name = "vbus_usb1";
+        regulator-min-microvolt = <5000000>;
+        regulator-max-microvolt = <5000000>;
+        
+        /* USB1 EN -> PH10 */
+        gpio = <&gpioh 10 GPIO_ACTIVE_HIGH>; 
+        enable-active-high;
+    };
+
+    /* Regulator for USB2 (Host) */
+    vbus_sw_usb2: regulator-vbus-usb2 {
+        compatible = "regulator-fixed";
+        regulator-name = "vbus_usb2";
+        regulator-min-microvolt = <5000000>;
+        regulator-max-microvolt = <5000000>;
+        
+        /* USB2 EN -> PH11 */
+        gpio = <&gpioh 11 GPIO_ACTIVE_HIGH>; 
+        enable-active-high;
+    };
+};
+
+&pinctrl {
+    /* --- Pin Definitions --- */
+    
+    usb_power_pins_mx: usb-power-pins-mx-0 {
+        pins-en {
+            /* USB1 EN (PH10), USB2 EN (PH11) */
+            pinmux = <STM32_PINMUX('H', 10, GPIO)>,
+                     <STM32_PINMUX('H', 11, GPIO)>;
+            bias-disable;
+            drive-push-pull;
+            output-low; /* Default to OFF */
+        };
+
+        pins-oc {
+            /* USB1 OC (PH14), USB2 OC (PH15) */
+            pinmux = <STM32_PINMUX('H', 14, GPIO)>,
+                     <STM32_PINMUX('H', 15, GPIO)>;
+            /* Important: OC is Open Drain Active Low, so we need Pull-Up */
+            bias-pull-up; 
+        };
+    };
+};
+
+/* --- USB Controllers --- */
+
+/* USB1: OTG Controller used in HOST mode */
+&usbotg_hs {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&usb_otg_hs_pins_a &usb_power_pins_mx>;
+    vbus-supply = <&vbus_sw_usb1>;
+    
+    /* CRITICAL for Type-A Connectors: Force Host mode */
+    dr_mode = "host"; 
+    
+    phys = <&usbphyc_port1 0>;
+    phy-names = "usb2-phy";
+};
+
+/* USB2: EHCI Host Controller */
+&usbh_ehci {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&usbh_ehci_pins_a &usb_power_pins_mx>;
+    vbus-supply = <&vbus_sw_usb2>;
+    
+    phys = <&usbphyc_port0>;
+    phy-names = "usb";
+};
+
+&usbh_ohci {
+    status = "okay";
+    phys = <&usbphyc_port0>;
+    phy-names = "usb";
+    vbus-supply = <&vbus_sw_usb2>;
+};
+
+&usbphyc {
+    status = "okay";
+    vdd3v3-supply = <&vdd_usb>; 
+};
+
+&usbphyc_port0 {
+    status = "okay";
+    phy-supply = <&vbus_sw_usb2>;
+};
+
+&usbphyc_port1 {
+    status = "okay";
+    phy-supply = <&vbus_sw_usb1>;
+};
