@@ -1,35 +1,37 @@
+/* REQUIRED HEADERS */
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/stm32-pinfunc.h>
+
 / {
     /* =====================================================================
      * USB VBUS REGULATORS
      * =====================================================================
-     * Controlled by STMPS2252 (Active High Enable).
-     * Regulator nodes OWN the pin configuration for cleanliness.
+     * Drivers for the STMPS2252 Power Switch.
      */
 
-    /* USB1 (OTG Port) VBUS Regulator */
+    /* USB1 (OTG Port) VBUS */
     vbus_sw_usb1: regulator-vbus-usb1 {
         compatible = "regulator-fixed";
         regulator-name = "vbus_usb1";
         regulator-min-microvolt = <5000000>;
         regulator-max-microvolt = <5000000>;
         
-        /* PH10 connected to STMPS2252 EN1 */
+        /* PH10 -> STMPS2252 EN1 (Active High) */
         gpio = <&gpioh 10 GPIO_ACTIVE_HIGH>; 
         enable-active-high;
         
-        /* Pin config ensures EN is driven and OC is monitored safely */
         pinctrl-names = "default";
         pinctrl-0 = <&usb1_vbus_pins_mx>; 
     };
 
-    /* USB2 (Host Port) VBUS Regulator */
+    /* USB2 (Host Port) VBUS */
     vbus_sw_usb2: regulator-vbus-usb2 {
         compatible = "regulator-fixed";
         regulator-name = "vbus_usb2";
         regulator-min-microvolt = <5000000>;
         regulator-max-microvolt = <5000000>;
         
-        /* PH11 connected to STMPS2252 EN2 */
+        /* PH11 -> STMPS2252 EN2 (Active High) */
         gpio = <&gpioh 11 GPIO_ACTIVE_HIGH>; 
         enable-active-high;
         
@@ -40,40 +42,36 @@
 
 &pinctrl {
     /* =====================================================================
-     * PIN MUX DEFINITIONS
+     * PIN CONFIGURATION
      * =====================================================================
      */
 
-    /* USB1 Power Pins: EN=PH10, OC=PH14 */
+    /* USB1 Power Control */
     usb1_vbus_pins_mx: usb1-vbus-pins-mx-0 {
         pins-en {
             pinmux = <STM32_PINMUX('H', 10, GPIO)>;
             bias-disable;
             drive-push-pull;
-            output-low; /* Start with Power OFF */
+            output-low; /* Default OFF */
         };
         pins-oc {
             pinmux = <STM32_PINMUX('H', 14, GPIO)>;
-            /* * SCHEMATIC NOTE: R175 (10k) external pull-up is present.
-             * We set bias-disable (High-Z) to respect the external hardware.
-             */
+            /* External Pull-Up (R175) present on PCB. Keep High-Z. */
             bias-disable; 
         };
     };
 
-    /* USB2 Power Pins: EN=PH11, OC=PH15 */
+    /* USB2 Power Control */
     usb2_vbus_pins_mx: usb2-vbus-pins-mx-0 {
         pins-en {
             pinmux = <STM32_PINMUX('H', 11, GPIO)>;
             bias-disable;
             drive-push-pull;
-            output-low; /* Start with Power OFF */
+            output-low; /* Default OFF */
         };
         pins-oc {
             pinmux = <STM32_PINMUX('H', 15, GPIO)>;
-            /* * SCHEMATIC NOTE: R174 (10k) external pull-up is present.
-             * We set bias-disable (High-Z) to respect the external hardware.
-             */
+            /* External Pull-Up (R174) present on PCB. Keep High-Z. */
             bias-disable; 
         };
     };
@@ -84,31 +82,26 @@
  * =====================================================================
  */
 
-/* * USB1 - OTG High Speed Controller 
- * Mapped to Physical Port 1.
- * Type-A Connector -> Forced HOST mode.
- */
+/* USB1: OTG Controller -> Type-A Host */
 &usbotg_hs {
     status = "okay";
-    pinctrl-names = "default";
-    pinctrl-0 = <&usb_otg_hs_pins_a>; /* Data pins only */
+    
+    /* NO PINCTRL: Data pins are dedicated. ID pin is unconnected. */
     
     vbus-supply = <&vbus_sw_usb1>;
     
-    /* CRITICAL: Force Host mode because Type-A has no ID pin */
+    /* Force HOST mode (ignores missing ID pin) */
     dr_mode = "host"; 
     
     phys = <&usbphyc_port1 0>;
     phy-names = "usb2-phy";
 };
 
-/* * USB2 - EHCI Host Controller
- * Mapped to Physical Port 0.
- */
+/* USB2: EHCI Host Controller */
 &usbh_ehci {
     status = "okay";
-    pinctrl-names = "default";
-    pinctrl-0 = <&usbh_ehci_pins_a>; /* Data pins only */
+    
+    /* NO PINCTRL: Data pins are dedicated. */
     
     vbus-supply = <&vbus_sw_usb2>;
     
@@ -116,7 +109,7 @@
     phy-names = "usb";
 };
 
-/* USB2 - OHCI Companion Controller (for USB 1.1 devices) */
+/* USB2 Companion: OHCI (USB 1.1) */
 &usbh_ohci {
     status = "okay";
     phys = <&usbphyc_port0>;
@@ -125,20 +118,27 @@
 };
 
 /* =====================================================================
- * PHY CONFIGURATION
+ * PHY TUNING (Critical for ECMF02 Filter)
  * =====================================================================
  */
 
 &usbphyc {
     status = "okay";
-    /* The PHY silicon runs on 3.3V, not VBUS */
     vdd3v3-supply = <&vdd_usb>; 
 };
 
 &usbphyc_port0 {
     status = "okay";
+    st,tune-hs-dc-level = <2>;
+    st,enable-hs-rtime-reduction;
+    st,trim-fine-tune = <3>;
+    st,current-boost-microamp = <1000>; 
 };
 
 &usbphyc_port1 {
     status = "okay";
+    st,tune-hs-dc-level = <2>;
+    st,enable-hs-rtime-reduction;
+    st,trim-fine-tune = <3>;
+    st,current-boost-microamp = <1000>;
 };
