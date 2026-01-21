@@ -1,59 +1,29 @@
-# =====================================================================
-# U-Boot Environment Script to flash TF-A to eMMC boot0 partition
-# =====================================================================
+# --- Configuration ---
+# Name of the eMMC TF-A binary (Must be the -emmc version!)
+tfa_image=tf-a-emmc.stm32
 
-# 1. Configuration variables
-# Assuming SD card is mmc 0 and eMMC is mmc 1
-env set sddev 0
-env set emmcdev 1
-# Partition on SD card where payloads are stored (partition 3 in our genimage config)
-env set payload_part 3
-# The file to flash
-env set tfa_image tf-a-emmc.stm32
+# Size to write (TF-A partition is 256KB)
+# 256KB / 512 bytes = 512 blocks = 0x200 hex
+tfa_write_size=0x200
 
-echo "--- Starting TF-A Installation to eMMC boot0 ---"
+# --- Functions ---
 
-# 2. Select the eMMC device and its boot0 partition
-# 'mmc dev [dev] [part]' -> part 1 is boot0, part 2 is boot1
-if mmc dev ${emmcdev} 1; then
-    echo "Switched to eMMC (mmc ${emmcdev}) boot0 partition."
-else
-    echo "ERROR: Could not switch to eMMC boot0 partition!"
-    exit
-fi
+# 1. Load the TF-A image from SD Card (mmc 0) Partition 3
+# We assume 'uEnv.txt' and the image are in the same partition (Partition 3)
+getTfaImage=fatload mmc 0:3 ${loadaddr} ${tfa_image}
 
-# 3. Load the TF-A image from the SD card into RAM
-echo "Loading ${tfa_image} from SD card..."
-if fatload mmc ${sddev}:${payload_part} ${loadaddr} ${tfa_image}; then
-    echo "Loaded ${filesize} bytes to ${loadaddr}."
-else
-    echo "ERROR: Failed to load ${tfa_image} from SD card!"
-    exit
-fi
+# 2. Flash to eMMC (mmc 1) Boot Partition 0
+# 'mmc dev 1 1' selects Device 1 (eMMC) and Partition 1 (Boot0)
+updateTfaEmmc=mmc dev 1 1; mmc write ${loadaddr} 0 ${tfa_write_size}
 
-# 4. Calculate number of 512-byte blocks to write
-# setexpr rounds down, so add (blocksize - 1) before dividing
-setexpr blkcnt ${filesize} + 1ff
-setexpr blkcnt ${blkcnt} / 200
+# 3. Configure eMMC Header (Boot from boot0)
+# Syntax: mmc partconf [dev] [boot_ack] [boot_part] [access]
+# boot_ack=1, boot_part=1 (Boot0), access=0 (User)
+configEmmcBoot=mmc partconf 1 1 1 0
 
-# 5. Write the image to the beginning (block 0) of the eMMC boot0 partition
-echo "Writing ${blkcnt} blocks to eMMC boot0..."
-if mmc write ${loadaddr} 0 ${blkcnt}; then
-    echo "TF-A flashed successfully!"
-else
-    echo "ERROR: Failed to write to eMMC boot0!"
-    exit
-fi
+# --- The Main Command ---
+# This combines the steps. U-Boot runs this automatically.
+installCmd=echo "--- Flashing TF-A to eMMC ---"; run getTfaImage; run updateTfaEmmc; run configEmmcBoot; echo "--- DONE. Power off and switch to eMMC Boot ---"
 
-# 6. Configure eMMC to boot from boot0 (Partition 1)
-# mmc partconf [dev] [boot_ack] [boot_partition] [partition_access]
-# boot_partition: 1=boot0, 2=boot1, 7=user
-echo "Configuring eMMC to boot from boot0..."
-if mmc partconf ${emmcdev} 1 1 0; then
-    echo "eMMC boot configuration updated."
-else
-    echo "ERROR: Failed to configure eMMC boot partition!"
-    exit
-fi
-
-echo "--- Installation complete. Please power down and set boot switches to eMMC. ---"
+# Trigger
+uenvcmd=run installCmd
