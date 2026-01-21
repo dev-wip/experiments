@@ -1,29 +1,33 @@
 # --- Configuration ---
-# Name of the eMMC TF-A binary (Must be the -emmc version!)
+# Your TF-A file for eMMC (Make sure it is the EMMC version!)
 tfa_image=tf-a-emmc.stm32
 
-# Size to write (TF-A partition is 256KB)
-# 256KB / 512 bytes = 512 blocks = 0x200 hex
+# 256KB = 512 blocks = 0x200 hex
 tfa_write_size=0x200
 
 # --- Functions ---
 
-# 1. Load the TF-A image from SD Card (mmc 0) Partition 3
-# We assume 'uEnv.txt' and the image are in the same partition (Partition 3)
+# 1. Load Image from SD Card
 getTfaImage=fatload mmc 0:3 ${loadaddr} ${tfa_image}
 
-# 2. Flash to eMMC (mmc 1) Boot Partition 0
-# 'mmc dev 1 1' selects Device 1 (eMMC) and Partition 1 (Boot0)
-updateTfaEmmc=mmc dev 1 1; mmc write ${loadaddr} 0 ${tfa_write_size}
+# 2. Flash Sequence (The User's Fix)
+# Step A: Configure eMMC to ENABLE writing to Boot Partition 1 (Access=1)
+#         Also sets Boot=1 (Boot from here) and Ack=1.
+enableBootWrite=mmc partconf 1 1 1 1
 
-# 3. Configure eMMC Header (Boot from boot0)
-# Syntax: mmc partconf [dev] [boot_ack] [boot_part] [access]
-# boot_ack=1, boot_part=1 (Boot0), access=0 (User)
-configEmmcBoot=mmc partconf 1 1 1 0
+# Step B: Select the device (eMMC = 1)
+selectDev=mmc dev 1
 
-# --- The Main Command ---
-# This combines the steps. U-Boot runs this automatically.
-installCmd=echo "--- Flashing TF-A to eMMC ---"; run getTfaImage; run updateTfaEmmc; run configEmmcBoot; echo "--- DONE. Power off and switch to eMMC Boot ---"
+# Step C: Write the image to Block 0 of the now-exposed Boot Partition
+writeTfa=mmc write ${loadaddr} 0 ${tfa_write_size}
+
+# Step D: RESTORE Access to User Area (Access=0)
+#         CRITICAL: If you skip this, Linux cannot find the RootFS!
+restoreUserAccess=mmc partconf 1 1 1 0
+
+# --- Main Command ---
+# Runs the steps in exact order
+installCmd=echo "--- Loading Image ---"; run getTfaImage; echo "--- Enabling Boot Access ---"; run enableBootWrite; run selectDev; echo "--- Flashing ---"; run writeTfa; echo "--- Restoring User Access ---"; run restoreUserAccess; echo "--- SUCCESS. Power off and switch to eMMC boot. ---"
 
 # Trigger
 uenvcmd=run installCmd
