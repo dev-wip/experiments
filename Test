@@ -1,0 +1,33 @@
+const char * boot_script =
+    /* --- 1. SETUP --- */
+    "echo \"--- FORCED BOOT MODE (System A only) ---\"; "
+    
+    /* Select eMMC User Area (Device 1) */
+    "mmc dev 1; "
+
+    /* --- 2. PREPARE ARGS --- */
+    /* Note: We DO NOT pass 'rauc.slot=A' here if we want to test pure boot, */
+    /* but adding it doesn't hurt. 'rootwait' is essential. */
+    "setenv bootargs console=ttySTM0,115200 rootwait earlyprintk; "
+
+    /* --- 3. LOAD KERNEL --- */
+    /* Load fitImage from Partition 5 (System A) */
+    "echo \"Loading fitImage from mmc 1:5...\"; "
+    "if ext4load mmc 1:5 ${loadaddr} /boot/fitImage; "
+    "then; "
+        "echo \"Image loaded. Booting...\"; "
+        "bootm ${loadaddr}; "
+    "else; "
+        "echo \"CRITICAL ERROR: Failed to load fitImage from p5\"; "
+        "echo \"Verifying partition content:\"; "
+        "ext4ls mmc 1:5 /boot; "
+    "fi; "
+
+    /* --- 4. FALLBACK (Optional Hang) --- */
+    "echo \"Boot failed. Dropping to shell.\"; ";
+
+
+-----
+
+
+
