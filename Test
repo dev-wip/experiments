@@ -1,33 +1,33 @@
 const char * boot_script =
     /* --- 1. SETUP --- */
-    "echo \"--- FORCED BOOT MODE (System A only) ---\"; "
+    "echo \"--- FORCED RAW BOOT (System A / Partition 2) ---\"; "
     
     /* Select eMMC User Area (Device 1) */
     "mmc dev 1; "
 
     /* --- 2. PREPARE ARGS --- */
-    /* Note: We DO NOT pass 'rauc.slot=A' here if we want to test pure boot, */
-    /* but adding it doesn't hurt. 'rootwait' is essential. */
+    /* rootwait is essential. We skip root=/dev/xxx because fitImage usually handles mounting via initramfs */
     "setenv bootargs console=ttySTM0,115200 rootwait earlyprintk; "
 
-    /* --- 3. LOAD KERNEL --- */
-    /* Load fitImage from Partition 5 (System A) */
-    "echo \"Loading fitImage from mmc 1:5...\"; "
-    "if ext4load mmc 1:5 ${loadaddr} /boot/fitImage; "
+    /* --- 3. LOAD KERNEL (RAW) --- */
+    "echo \"Reading raw fitImage from mmc 1:2...\"; "
+
+    /* A. Get the Start Block address of Partition 2 */
+    "part start mmc 1 2 part_start; "
+    
+    /* B. Get the Size (in blocks) of Partition 2 */
+    "part size mmc 1 2 part_size; "
+
+    /* C. Read the raw blocks into RAM */
+    /* Syntax: mmc read [addr] [start_block] [block_count] */
+    "if mmc read ${loadaddr} ${part_start} ${part_size}; "
     "then; "
-        "echo \"Image loaded. Booting...\"; "
+        "echo \"Raw Image loaded. Booting...\"; "
         "bootm ${loadaddr}; "
     "else; "
-        "echo \"CRITICAL ERROR: Failed to load fitImage from p5\"; "
-        "echo \"Verifying partition content:\"; "
-        "ext4ls mmc 1:5 /boot; "
+        "echo \"CRITICAL ERROR: Failed to read raw blocks from p2\"; "
+        "part list mmc 1; "
     "fi; "
 
-    /* --- 4. FALLBACK (Optional Hang) --- */
+    /* --- 4. FALLBACK --- */
     "echo \"Boot failed. Dropping to shell.\"; ";
-
-
------
-
-
-
