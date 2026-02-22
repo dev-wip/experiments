@@ -1,45 +1,24 @@
-# create_data_ext4.inc
+SUMMARY = "Generates an empty ext4 data partition"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-# Default size in MB (can be overridden in the main recipe)
-DATA_PART_SIZE ?= "120"
-DATA_PART_NAME ?= "data.ext4"
+DEPENDS = "e2fsprogs-native"
 
-# We need mkfs.ext4 from the build host tools
-DEPENDS += "e2fsprogs-native"
+inherit deploy
 
-# 1. Define the task to create the image
-do_create_data_partition() {
-    # path to the output file in the working directory
-    IMG_PATH="${WORKDIR}/${DATA_PART_NAME}"
+DATA_PART_SIZE_MB = "120"
+DATA_PART_NAME = "data.ext4"
 
-    # Create a blank file filled with zeros
-    # bs=1M count=120 creates a 120MB file
-    dd if=/dev/zero of=${IMG_PATH} bs=1M count=${DATA_PART_SIZE}
-
-    # Format it as ext4
-    # -F: Force execution
-    # -L: Label the partition "DATA"
-    mkfs.ext4 -F -L "DATA" ${IMG_PATH}
+# 1. Generate the file in the safe working directory
+do_compile() {
+    dd if=/dev/zero of=${WORKDIR}/${DATA_PART_NAME} bs=1M count=${DATA_PART_SIZE_MB}
+    mkfs.ext4 -F -L "DATA" ${WORKDIR}/${DATA_PART_NAME}
 }
 
-# 2. Schedule the task
-# It must run before deploy so we can copy the result
-addtask create_data_partition after do_compile before do_deploy
-
-# 3. Deploy the file to the deployment directory
-# This ensures genimage can find it in ${DEPLOYDIR}
-do_deploy:append() {
+# 2. Deploy it using standard Yocto mechanisms
+do_deploy() {
+    install -d ${DEPLOYDIR}
     install -m 0644 ${WORKDIR}/${DATA_PART_NAME} ${DEPLOYDIR}/
 }
 
-
-
-
-
-# inside your main recipe file
-
-# Define a variable (default to "0" for off)
-ENABLE_DATA_PARTITION ?= "0"
-
-# Conditionally require the file if the variable is "1"
-require ${@'create_data_ext4.inc' if d.getVar('ENABLE_DATA_PARTITION') == '1' else ''}
+addtask deploy after do_compile
