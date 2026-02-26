@@ -1,24 +1,21 @@
-SUMMARY = "Generates an empty ext4 data partition"
-LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+NorStart=@NOR_START@
+NorBytesToWrite=@NOR_BYTES_TO_WRITE@
 
-DEPENDS = "e2fsprogs-native"
+# Helper to safely calculate blocks (rounds up to ensure no truncation)
+calc_blks=setexpr blkcnt ${filesize} + 0x1ff; setexpr blkcnt ${blkcnt} / 0x200
 
-inherit deploy
+# 1. Flash SPI-NOR (Exactly as original)
+updateSPINor=echo Flashing image from SDCard to NOR...; sf probe; sf erase ${NorStart} ${NorBytesToWrite}; fatload mmc ${envpart} ${loadaddr} nor-image.img; sf write ${loadaddr} ${NorStart} ${NorBytesToWrite}
 
-DATA_PART_SIZE_MB = "120"
-DATA_PART_NAME = "data.ext4"
+# 2. Flash TF-A to eMMC Boot0 (Hardware Partition 1)
+# Note: Ensure the filename here matches what genimage copies to the vfat partition
+updateEmmcBoot0=echo Flashing TF-A to eMMC Boot0...; mmc dev 1 1; fatload mmc ${envpart} ${loadaddr} tf-a-sdcard.stm32; run calc_blks; mmc erase 0x0 ${blkcnt}; mmc write ${loadaddr} 0x0 ${blkcnt}
 
-# 1. Generate the file in the safe working directory
-do_compile() {
-    dd if=/dev/zero of=${WORKDIR}/${DATA_PART_NAME} bs=1M count=${DATA_PART_SIZE_MB}
-    mkfs.ext4 -F -L "DATA" ${WORKDIR}/${DATA_PART_NAME}
-}
+# 3. Flash eMMC User Area (Hardware Partition 0) with 1GB Full Erase
+updateEmmcUser=echo Erasing entire 1GB eMMC...; mmc dev 1 0; mmc erase 0x0 0x200000; echo Loading eMMC Image...; fatload mmc ${envpart} ${loadaddr} emmc.img; run calc_blks; echo Writing new image...; mmc write ${loadaddr} 0x0 ${blkcnt}
 
-# 2. Deploy it using standard Yocto mechanisms
-do_deploy() {
-    install -d ${DEPLOYDIR}
-    install -m 0644 ${WORKDIR}/${DATA_PART_NAME} ${DEPLOYDIR}/
-}
+# Main Execution Sequence
+flashCmd=run updateSPINor; run updateEmmcBoot0; run updateEmmcUser; echo PLEASE POWER DOWN, EJECT SDCARD, AND POWER BACK UP TO BOOT FROM ONBOARD FLASH!!; sleep 99999;
 
-addtask deploy after do_compile
+# Entry Point
+uenvcmd=run flashCmd;
