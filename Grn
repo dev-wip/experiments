@@ -19,3 +19,5 @@ flashCmd=run updateSPINor; run updateEmmcBoot0; run updateEmmcUser; echo PLEASE 
 
 # Entry Point
 uenvcmd=run flashCmd;
+
+setenv write_chunk 'if itest ${remaining} > ${chunk_bytes}; then setenv read_size ${chunk_bytes}; else setenv read_size ${remaining}; fi; echo --- Loop ${loops} ---; echo Mock loading ${read_size} bytes at file offset ${file_offset}...; setexpr blkcnt ${read_size} + 0x1ff; setexpr blkcnt ${blkcnt} / 0x200; echo Mock writing ${blkcnt} blocks at eMMC offset ${blk_offset}...; setexpr file_offset ${file_offset} + ${read_size}; setexpr blk_offset ${blk_offset} + ${blkcnt}; setexpr remaining ${remaining} - ${read_size}; setexpr loops ${loops} + 1; if itest ${loops} > 10; then echo "ERROR: Loop guard triggered!"; else if itest ${remaining} > 0; then run write_chunk; else echo "eMMC Flash Complete! Total loops: ${loops}"; fi; fi'
